@@ -1,0 +1,59 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: gitlab-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 15067
+      name: GitlabTCP
+      protocol: TCP
+    hosts:
+    - "*"
+  - port:
+      number: 15068
+      name: GitlabSsh
+      protocol: TCP
+    hosts:
+    - "*"
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gitlab
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - gitlab-gateway
+  tcp:
+  - match:
+    - port: 15067
+    route:
+    - destination:
+        host: gitlab.gitlab.svc.cluster.local
+        port:
+          number: 80
+  - match:
+    - port: 15068
+    route:
+      - destination:
+          host: gitlab.gitlab.svc.cluster.local
+          port:
+            number: 22
+
+
+---
+apiVersion: "networking.istio.io/v1alpha3"
+kind: "DestinationRule"
+metadata:
+  name: "gitlab"
+  namespace: "gitlab"
+spec:
+  host: "*.local"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

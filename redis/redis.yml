@@ -1,0 +1,41 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app: gitlab
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: gitlab
+        tier: backend
+    spec:
+      containers:
+        - image: redis:3.0.7-alpine
+#        - image: sameersbn/redis:4.0.9-1
+          name: redis
+          resources:
+            requests:
+              memory: "1Gi"
+#              cpu: "500m"
+            limits:
+              memory: "1Gi"
+#              cpu: "1"
+          ports:
+            - containerPort: 6379
+              name: redis
+          envFrom:
+             - configMapRef:
+                 name: redis-configmap
+          volumeMounts:
+            - name: gitlab
+              mountPath: /data
+      volumes:
+        - name: gitlab
+          emptyDir: {}
+#          persistentVolumeClaim:
+#            claimName: gitlab-claim

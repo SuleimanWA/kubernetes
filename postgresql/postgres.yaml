@@ -1,0 +1,66 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgresql
+  labels:
+    app: gitlab
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: gitlab
+        tier: postgreSQL
+    spec:
+      containers:
+        - image: postgres:9.6-alpine #latest
+          name: postgresql
+          env:
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: DB_NAME
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: DB_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: DB_PASS
+          ports:
+            - containerPort: 5432
+              name: postgresql
+          volumeMounts:
+            - name: gitlab
+              mountPath: /var/lib/postgresql/data1
+          livenessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -h
+              - localhost
+              - -U
+              - postgres
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -h
+              - localhost
+              - -U
+              - postgres
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+
+      volumes:
+        - name: gitlab
+          emptyDir: {}
+#          persistentVolumeClaim:
+#            claimName: gitlab-claim

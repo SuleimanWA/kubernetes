@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-configmap
+  labels:
+    app: postgresql
+data:
+  REDIS_HOST: redis
+  REDIS_PORT: "6379" #postgresadmin
+#  POSTGRES_PASSWORD: gitlab #admin123

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgresql
+data:
+  POSTGRES_DB_HOST: postgresql
+  POSTGRES_DB_NAME: gitlab
+  POSTGRES_PORT: "5432"
