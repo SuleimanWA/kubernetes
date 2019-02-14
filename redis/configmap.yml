@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: redis-configmap
   labels:
-    app: postgresql
+    app: redis
 data:
   REDIS_HOST: redis
   REDIS_PORT: "6379" #postgresadmin
